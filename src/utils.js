@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 /**
  * 
  * @returns current date and time in this format ddMMyyyyHHmmss in UTC timezone
@@ -16,4 +18,16 @@ function getCurrentDateTime() {
     return `${day}${month}${year}${hours}${minutes}${seconds}`;
 }
 
-module.exports = getCurrentDateTime;
+
+function generateSignature(url, method, params, xGiftlovDate, authToken, apiEncryptionKey) {
+    // sorting params in lexicographic order.
+    const sortedParams = Object.entries(params).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+    // combining sorted params in a string.
+    const mappedParams = sortedParams.map(([key, value]) => value).join('');
+
+    let signatureString = `${url}${method.toUpperCase()}${mappedParams}${xGiftlovDate}${authToken}`;
+    return crypto.createHmac('sha512', apiEncryptionKey).update(signatureString).digest('hex');
+}
+
+
+module.exports = {getCurrentDateTime, generateSignature};
