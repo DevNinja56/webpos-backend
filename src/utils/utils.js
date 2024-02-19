@@ -1,3 +1,4 @@
+const { HttpStatusCode } = require('axios');
 const crypto = require('crypto');
 
 /**
@@ -29,6 +30,16 @@ function generateSignature(url, method, params, xGiftlovDate, authToken, apiEncr
     return crypto.createHmac('sha512', apiEncryptionKey).update(signatureString).digest('hex');
 }
 
+function getSignature(req, currentTime, method) {
+    const requestMethod = method ?? req.method;
+    const requestParams = Object.assign(req.query);
+    const authToken = req.headers['authorization'];
+    const apiEncryptionKey = 'coding_challenge_1';
 
+    if(!authToken){
+        throw new Error("Authorization header missing", HttpStatusCode.Unauthorized);
+    }
+    return generateSignature(req.meta.url, requestMethod, requestParams, currentTime, authToken, apiEncryptionKey);
+}
 
-module.exports = {getCurrentDateTime, generateSignature};
+module.exports = {getCurrentDateTime, getSignature};

@@ -1,8 +1,9 @@
 
 function exceptionHandler(error, request, response, next) {
-    console.error(error.response?.data);
-    const status = error.response?.status || 400;
-    response.status(status).send(error.response?.data.message);
+    const errorMessage = error.message ?? error.response?.data;
+    const status = error.status ?? error.response?.status ?? 400;
+    console.error(errorMessage);
+    response.status(status).send(errorMessage);
 }
 
 module.exports = exceptionHandler;
