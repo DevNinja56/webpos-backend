@@ -1,5 +1,7 @@
 const { default: axios } = require("axios");
-const { generateSignature, getCurrentDateTime } = require("../utils");
+const { generateSignature, getCurrentDateTime } = require("../utils/utils");
+const Item = require("../modals/Item");
+const login = require("./auth");
 
 async function getItems(req) {
     const currentTime = getCurrentDateTime();
@@ -12,7 +14,7 @@ async function getItems(req) {
         },
         headers: { 
             'X-GIFTLOV-DATE': currentTime, 
-            'Authorization': req.get('Authorization'), 
+            'Authorization': req.headers['authorization'], 
             'Signature': signature 
         }
     },);
@@ -22,10 +24,38 @@ async function getItems(req) {
     throw new Error(response.statusMessage).status(response.status)
 }
 
+async function syncItems() {
+        try{
+        response = await login('coding_challenge_1', 'coding_challenge_1');
+        const req = {
+            headers: {
+                authorization: response.token
+            },
+            query: {
+                current: 1,
+                rowCount: 100,
+                lang: 'EN'
+            },
+            method: 'GET',
+            meta: {
+                url: 'items'
+            }
+        }
+        const items = await getItems(req);
+        //reset data in database
+        await Item.deleteMany({});
+        await Item.insertMany(items['items']);
+        
+        console.log("Items Synchronised Successfully");
+    }catch(e){
+        console.error("Error Synchronisign database: ", e);
+    }
+}
+
 function getSignature(req, currentTime) {
     const requestMethod = req.method;
     const requestParams = req.query;
-    const authToken = req.get('Authorization');
+    const authToken = req.headers['authorization'];
     // Example usage:
     const xGiftlovDate = '18022024124723';
     // const authToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJNdW5lcm8iLCJleHAiOjE3MDgxNTU4MTIsInR5cGUiOiJBdXRob3JpemF0aW9uVG9rZW4iLCJjcmVhdGlvbkRhdGUiOjE3MDgwNjk0MTIsInVzZXJJZCI6MTEzLCJ2ZXJzaW9uIjoxfQ._yKnLh27n1NCzl8TyL2KsEzRHYKINJRQt3dAHghk5TI';
@@ -34,4 +64,4 @@ function getSignature(req, currentTime) {
     return generateSignature(req.meta.url, requestMethod, requestParams, currentTime, authToken, apiEncryptionKey);
 }
 
-module.exports = { getItems };
+module.exports = { getItems, syncItems };

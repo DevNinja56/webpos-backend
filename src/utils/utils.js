@@ -30,4 +30,5 @@ function generateSignature(url, method, params, xGiftlovDate, authToken, apiEncr
 }
 
 
+
 module.exports = {getCurrentDateTime, generateSignature};

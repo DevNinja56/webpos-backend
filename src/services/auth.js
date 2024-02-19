@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-const { getCurrentDateTime } = require("../utils");
+const { getCurrentDateTime } = require("../utils/utils");
 
 
 async function login(username, password) {
