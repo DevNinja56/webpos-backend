@@ -4,7 +4,7 @@ const { getCurrentDateTime } = require("../utils/utils");
 
 async function login(username, password) {
     const currentTime = getCurrentDateTime();
-    const response = await axios.post('https://api.giftlov.com/api/Base/generateToken', {
+    const response = await axios.post(process.env.GENERATE_TOKEN_URL, {
         username,
         password
     }, {'X-GIFTLOV-DATE': currentTime});

@@ -6,7 +6,7 @@ const login = require("./auth");
 async function getItems(req) {
     const currentTime = getCurrentDateTime();
     const signature = getSignature(req, currentTime);
-    const response = await axios.get(`https://api.giftlov.com/api/Base/items`, {
+    const response = await axios.get(process.env.ITEMS_URL, {
         params: {
             current: req.query.current,
             rowCount: req.query.rowCount,
@@ -26,7 +26,7 @@ async function getItems(req) {
 
 async function syncItems() {
         try{
-        response = await login('coding_challenge_1', 'coding_challenge_1');
+        response = await login(process.env.USERNAME, process.env.PASSWORD);
         const req = {
             headers: {
                 authorization: response.token

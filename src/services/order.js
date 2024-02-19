@@ -14,9 +14,9 @@ async function placeOrder(req, data) {
                 'Signature': signature 
             }
         }
-        const response = await axios.post('https://api.giftlov.com/api/Base/placeOrder', data, config);
+        const response = await axios.post(process.env.PLACE_ORDER_URL, data, config);
         if(response.status == 200){
-            return {'token': response.data.id, 'expireDate': response.data.referenceNumber};
+            return {'id': response.data.id, 'referenceNumber': response.data.referenceNumber};
         }
         throw new Error(response.statusMessage).status(response.status)
     }catch(e){

@@ -34,7 +34,7 @@ function getSignature(req, currentTime, method) {
     const requestMethod = method ?? req.method;
     const requestParams = Object.assign(req.query);
     const authToken = req.headers['authorization'];
-    const apiEncryptionKey = 'coding_challenge_1';
+    const apiEncryptionKey = process.env.SECRET_KEY;
 
     if(!authToken){
         throw new Error("Authorization header missing", HttpStatusCode.Unauthorized);
